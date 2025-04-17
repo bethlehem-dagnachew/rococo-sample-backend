@@ -95,7 +95,7 @@ class AuthService:
             message = {
                 "event": "WELCOME_EMAIL",
                 "data": {
-                    "confirmation_link": confirmation_link,
+                    "verify_link": confirmation_link,
                     "recipient_name": f"{person.first_name} {person.last_name}".strip(),
                 },
                 "to_emails": [email],
@@ -162,7 +162,7 @@ class AuthService:
         if not person:
             raise APIException("Person does not exist.")
 
-        login_method = self.login_method_service.get_login_method_by_email_id(email.entity_id)
+        login_method = self.login_method_service.get_login_method_by_email_id(email_obj.entity_id)
         if not login_method:
             raise APIException("Login method does not exist.")
 
@@ -174,7 +174,7 @@ class AuthService:
             message = {
                 "event": "RESET_PASSWORD",
                 "data": {
-                    "reset_password_link": password_reset_url
+                    "verify_link": password_reset_url
                 },
                 "to_emails": [email],
             }

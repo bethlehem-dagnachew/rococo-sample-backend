@@ -8,18 +8,18 @@ services:
     volumes:
       - rococo-sample-rabbitmq-data:/var/lib/rabbitmq/mnesia/
     networks:
-        - backnet
+      - backnet
     env_file:
-    - .env.secrets
-    - ${APP_ENV}.env
+      - .env.secrets
+      - ${APP_ENV}.env
     ports:
-    - "5672:5672"
+      - "5672:5672"
     expose:
-    - "5672"
+      - "5672"
     healthcheck:
-        test: rabbitmq-diagnostics -q ping
-        timeout: 20s
-        retries: 10
+      test: rabbitmq-diagnostics -q ping
+      timeout: 20s
+      retries: 10
 
   postgres:
     image: rococo_sample_postgres
@@ -35,15 +35,15 @@ services:
       - .env.secrets
       - ${APP_ENV}.env
     volumes:
-        - rococo-sample-postgres-data:/var/lib/postgresql/data
+      - rococo-sample-postgres-data:/var/lib/postgresql/data
     ports:
-        - "5432:5432"
+      - "5432:5432"
     healthcheck:
-        test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-        timeout: 20s
-        retries: 10
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      timeout: 20s
+      retries: 10
     expose:
-        - 5432
+      - 5432
     user: postgres
 
   api:
@@ -51,21 +51,23 @@ services:
     image: rococo_sample_api
     container_name: rococo_sample_api
     build:
-        context: .
-        dockerfile: ./flask/Dockerfile
+      context: .
+      dockerfile: ./flask/Dockerfile
     volumes:
       - ./flask:/api
       - ./common:/api/common
     ports:
-      - '5000:5000'
+      - "5000:5000"
     env_file:
       - .env.secrets
       - ${APP_ENV}.env
     depends_on:
       postgres:
-          condition: service_healthy
+        condition: service_healthy
       rabbitmq:
-          condition: service_healthy
+        condition: service_healthy
+      email_transmitter:
+        condition: service_started
     networks:
       - backnet
 
@@ -88,7 +90,6 @@ services:
         condition: service_healthy
     volumes:
       - ./services/email_transmitter/config.json:/app/src/services/email_transmitter/src/config.json
-
 
 volumes:
   rococo-sample-postgres-data:
