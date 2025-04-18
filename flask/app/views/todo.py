@@ -22,13 +22,6 @@ class BaseTodoResource(Resource):
 @todo_api.route("")
 class Todos(BaseTodoResource):
     @login_required()
-    def get(self, person):
-        """Get all todos for the current user with optional filtering."""
-        filter_type = request.args.get("filter", "all")  
-        todos = self.todo_service.get_todo_list(person.entity_id, filter_type)
-        return get_success_response(todos=[todo.as_dict() for todo in todos])
-
-    @login_required()
     @todo_api.expect(
         {
             "type": "object",
@@ -52,10 +45,11 @@ class Todos(BaseTodoResource):
         )
 
     @login_required()
-    def delete(self, person):
-        """Delete all completed tasks."""
-        self.todo_service.delete_completed_todo_list(person.entity_id)
-        return get_success_response(message="All completed tasks deleted successfully.")
+    def get(self, person):
+        """Get all todos with all, active, completed option."""
+        filter_type = request.args.get("filter", "all")  
+        todos = self.todo_service.get_todo_list(person.entity_id, filter_type)
+        return get_success_response(todos=[todo.as_dict() for todo in todos])
 
 
 @todo_api.route("/<string:entity_id>")
@@ -64,7 +58,7 @@ class TodoItem(BaseTodoResource):
 
     @login_required()
     def get(self, entity_id, person):
-        """Get a specific todo."""
+        """Get a todo."""
         todo = self.todo_service.get_todo_list_item(entity_id)
         return get_success_response(todo=todo.as_dict())
 
@@ -79,7 +73,7 @@ class TodoItem(BaseTodoResource):
         }
     )
     def patch(self, entity_id, person):
-        """Update a specific task."""
+        """Update a task."""
         parsed_body = parse_request_body(request, ["title", "is_completed"])
         validate_required_fields({"title": parsed_body["title"]})
 
@@ -95,9 +89,20 @@ class TodoItem(BaseTodoResource):
 
     @login_required()
     def delete(self, entity_id, person):
-        """Delete a specific task."""
+        """Delete a task."""
         self.todo_service.delete_todo_list_item(entity_id)
         return get_success_response(message="Todo List deleted successfully.")
+
+
+@todo_api.route("")
+class DeleteAllCompletedTodos(BaseTodoResource):
+    """Endpoint for deleting all completed tasks."""
+
+    @login_required()
+    def delete(self, person):
+        """Delete all completed tasks."""
+        self.todo_service.delete_completed_todo_list(person.entity_id)
+        return get_success_response(message="All completed tasks deleted successfully.")
 
 
 @todo_api.route("/<string:entity_id>/status")
@@ -150,8 +155,7 @@ class ReorderTodos(BaseTodoResource):
             "properties": {
                 "todo_ids": {
                     "type": "array",
-                    "items": {"type": "string"},
-                    "description": "Array of todo IDs in the desired order"
+                    "items": {"type": "string"}
                 }
             },
             "required": ["todo_ids"]
