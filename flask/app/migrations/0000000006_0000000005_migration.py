@@ -16,6 +16,7 @@ def upgrade(migration):
             "title" varchar(255) NOT NULL,
             "is_completed" boolean DEFAULT false,
             "created_on" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+            "position" integer DEFAULT 0,
             PRIMARY KEY ("entity_id")
         """
     )
@@ -23,6 +24,7 @@ def upgrade(migration):
     # Add indexes for better query performance
     migration.add_index("todo", "todo_person_id_ind", "person_id")
     migration.add_index("todo", "todo_is_completed_ind", "is_completed")
+    migration.add_index("todo", "todo_position_ind", "position")
     
     # Create the todo_audit table for tracking changes
     migration.create_table(
@@ -38,6 +40,7 @@ def upgrade(migration):
             "title" varchar(255) NOT NULL,
             "is_completed" boolean DEFAULT false,
             "created_on" timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+            "position" integer DEFAULT 0,
             PRIMARY KEY ("entity_id", "version")
         """
     )
