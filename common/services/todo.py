@@ -17,19 +17,33 @@ class TodoListService:
         filters = {"person_id": person_id, "active": True}
         if filter_type in ["completed", "active"]:
             filters["is_completed"] = (filter_type == "completed")
-        return self.todo_repo.get_many(filters, sort=[("created_on", "desc")])
+        todos = self.todo_repo.get_many(filters)
+        return sorted(todos, key=lambda x: x.position)
 
     def create_todo_list_item(self, person_id, title):
         """Create a new todo item."""
-        todo = Todo(person_id=person_id, title=title)
+        todos = self.get_todo_list(person_id, "all")
+        todos = sorted(todos, key=lambda x: x.position)
+        
+        for todo in todos:
+            todo.position += 1
+            self.todo_repo.save(todo)
+        
+        todo = Todo(
+            person_id=person_id, 
+            title=title,
+            position=0  
+        )
         todo.prepare_for_save(changed_by_id=person_id)
         return self.todo_repo.save(todo)
 
-    def update_todo_list_item(self, entity_id, title, is_completed):
+    def update_todo_list_item(self, entity_id, title, is_completed, position=None):
         """Update a todo item."""
         todo = self.get_todo_list_item(entity_id)
         todo.title = title
         todo.is_completed = is_completed
+        if position is not None:
+            todo.position = position
         return self.todo_repo.save(todo)
 
     def update_todo_list_item_status(self, entity_id):

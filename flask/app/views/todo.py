@@ -138,3 +138,39 @@ class MarkAllTodos(BaseTodoResource):
             message=f"All todos marked as {parsed_body['status']}"
         )
 
+
+@todo_api.route("/reorder")
+class ReorderTodos(BaseTodoResource):
+    """Endpoint for reordering todos."""
+
+    @login_required()
+    @todo_api.expect(
+        {
+            "type": "object",
+            "properties": {
+                "todo_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Array of todo IDs in the desired order"
+                }
+            },
+            "required": ["todo_ids"]
+        }
+    )
+    def post(self, person):
+        """Reorder the todo list based on the provided order of IDs."""
+        parsed_body = parse_request_body(request, ["todo_ids"])
+        validate_required_fields(parsed_body)
+
+        for position, todo_id in enumerate(parsed_body["todo_ids"]):
+            todo = self.todo_service.get_todo_list_item(todo_id)
+            if todo:
+                self.todo_service.update_todo_list_item(
+                    entity_id=todo_id,
+                    title=todo.title,
+                    is_completed=todo.is_completed,
+                    position=position
+                )
+
+        return get_success_response(message="Todos reordered successfully")
+

@@ -9,4 +9,5 @@ class Todo(VersionedModel):
     person_id: str = None
     title: str = None
     is_completed: bool = False
+    position: int = 0  
     created_on: datetime = field(default_factory=default_datetime)
