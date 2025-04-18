@@ -51,6 +51,12 @@ class Todos(BaseTodoResource):
         todos = self.todo_service.get_todo_list(person.entity_id, filter_type)
         return get_success_response(todos=[todo.as_dict() for todo in todos])
 
+    @login_required()
+    def delete(self, person):
+        """Delete all completed tasks."""
+        self.todo_service.delete_completed_todo_list(person.entity_id)
+        return get_success_response(message="All completed tasks deleted successfully.")
+
 
 @todo_api.route("/<string:entity_id>")
 class TodoItem(BaseTodoResource):
@@ -94,17 +100,6 @@ class TodoItem(BaseTodoResource):
         return get_success_response(message="Todo List deleted successfully.")
 
 
-@todo_api.route("")
-class DeleteAllCompletedTodos(BaseTodoResource):
-    """Endpoint for deleting all completed tasks."""
-
-    @login_required()
-    def delete(self, person):
-        """Delete all completed tasks."""
-        self.todo_service.delete_completed_todo_list(person.entity_id)
-        return get_success_response(message="All completed tasks deleted successfully.")
-
-
 @todo_api.route("/<string:entity_id>/status")
 class TodoStatus(BaseTodoResource):
     """Endpoints for managing todo status."""
@@ -121,7 +116,7 @@ class TodoStatus(BaseTodoResource):
 
 @todo_api.route("/mark-all")
 class MarkAllTodos(BaseTodoResource):
-    """Endpoints for bulk todo operations."""
+    """Endpoints for handling multiple todo operations at once."""
 
     @login_required()
     @todo_api.expect(
