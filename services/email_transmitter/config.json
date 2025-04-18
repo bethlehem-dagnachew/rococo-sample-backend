@@ -1,25 +1,25 @@
 {
-    "configurations": [
-        {
-            "provider": "mailjet",
-            "sourceEmail": "SecondSight <system@secondsight.ai>",
-            "errorReportingEmail": "asymlabs@gmail.com"
-        }
-    ],
-    "events": {
-        "WELCOME_EMAIL": {
-            "subject": "Welcome {{var:recipient_name}}",
-            "templateName": "Welcome (PROD and TEST)",
-            "id": {
-                "mailjet": 4777555
-            }
-        },
-        "RESET_PASSWORD": {
-            "subject": "Reset your password",
-            "templateName": "Reset Password (PROD and TEST)",
-            "id": {
-                "mailjet": 4781139
-            }
-        }
+  "configurations": [
+    {
+      "provider": "mailjet",
+      "sourceEmail": "SecondSight <sample_project@ecortest.com>",
+      "errorReportingEmail": "serhatsdev@icloud.com"
     }
+  ],
+  "events": {
+    "WELCOME_EMAIL": {
+      "subject": "Please verify your email address",
+      "templateName": "Verify Email (PROD and TEST)",
+      "id": {
+        "mailjet": 6410451
+      }
+    },
+    "RESET_PASSWORD": {
+      "subject": "Reset your password",
+      "templateName": "Reset Password (PROD and TEST)",
+      "id": {
+        "mailjet": 6410454
+      }
+    }
+  }
 }
